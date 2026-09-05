@@ -1,0 +1,11 @@
+{
+  "appId": "com.zanji.family",
+  "appName": "咱家",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "ios": {
+    "contentInset": "automatic"
+  }
+}

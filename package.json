@@ -1,0 +1,12 @@
+{
+  "name": "family-app",
+  "version": "0.1.0",
+  "description": "咱家 - AI家庭专属App",
+  "private": true,
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@capacitor/cli": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
+    "@capacitor/ios": "^8.5.1"
+  }
+}

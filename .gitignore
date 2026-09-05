@@ -1,0 +1,8 @@
+# Dependencies
+node_modules/
+
+# Capacitor platform files (regenerated)
+ios/App/Pods/
+
+# OS files
+.DS_Store
