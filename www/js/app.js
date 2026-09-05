@@ -62,9 +62,7 @@ const App = {
   }
 };
 
-/* 跑步视图占位接口（第二批实现） */
-const Running = { render() {} };
-/* 电脑桥视图占位接口（第三批实现） */
-const Bridge = { render() {} };
+/* 跑步视图在 js/running.js 实现 */
+/* 电脑桥视图在 js/bridge.js 实现 */
 
 document.addEventListener('DOMContentLoaded', () => App.init());
