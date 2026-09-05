@@ -26,7 +26,7 @@ jobs:
         run: |
           cd ios/App
           xcodebuild \
-            -workspace App.xcworkspace \
+            -project App.xcodeproj \
             -scheme App \
             -configuration Release \
             -derivedDataPath build \
