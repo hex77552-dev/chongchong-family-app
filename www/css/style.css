@@ -1,0 +1,145 @@
+/* ========== 我的小窝 v0.2 设计系统 ==========
+   浅色纸墨风 · 手写楷体 · 无 emoji · 简约雅致 */
+
+@font-face {
+  font-family: 'Shouxie';
+  src: url('../assets/fonts/MaShanZheng-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root {
+  --bg: #faf7f1;
+  --card: #ffffff;
+  --ink: #2e2a24;
+  --ink-soft: #6b645a;
+  --ink-faint: #a89f92;
+  --line: #e9e2d5;
+  --accent: #c96f3a;
+  --accent-soft: #f3e3d5;
+  --accent-deep: #a5522a;
+  --radius: 18px;
+  --shadow: 0 2px 12px rgba(60, 45, 25, .05);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+
+body {
+  font-family: -apple-system, "PingFang SC", "Noto Sans SC", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-shouxie { font-family: 'Shouxie', cursive; }
+
+/* ========== 翻页容器 ========== */
+#view-container {
+  position: fixed; inset: 0;
+  overflow: hidden;
+}
+.view {
+  position: absolute; inset: 0;
+  padding: calc(64px + env(safe-area-inset-top)) 24px 110px;
+  overflow-y: auto;
+  opacity: 0;
+  transform: translateX(60px);
+  pointer-events: none;
+  transition: opacity .38s cubic-bezier(.22,.9,.3,1), transform .38s cubic-bezier(.22,.9,.3,1);
+  background: var(--bg);
+}
+.view.active {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+.view.slide-left { transform: translateX(-60px); }
+
+/* ========== 顶栏 ========== */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 20;
+  padding: calc(18px + env(safe-area-inset-top)) 24px 14px;
+  background: linear-gradient(180deg, rgba(250,247,241,.96), rgba(250,247,241,.82) 70%, transparent);
+  display: flex; align-items: baseline; gap: 10px;
+}
+.topbar .title { font-family: 'Shouxie'; font-size: 30px; color: var(--ink); letter-spacing: 2px; }
+.topbar .subtitle { font-size: 11px; color: var(--ink-faint); letter-spacing: 1px; }
+
+/* ========== 底部导航 ========== */
+.tabbar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  z-index: 20;
+  padding: 10px 30px calc(16px + env(safe-area-inset-bottom));
+  background: rgba(250,247,241,.92);
+  backdrop-filter: blur(14px);
+  border-top: 1px solid var(--line);
+  display: flex; justify-content: space-around;
+}
+.tab {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  border: none; background: none; cursor: pointer;
+  color: var(--ink-faint);
+  font-size: 11px; letter-spacing: 1px;
+  transition: color .25s;
+  padding: 4px 14px;
+}
+.tab svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.tab.active { color: var(--accent-deep); }
+
+/* ========== 通用组件 ========== */
+.section-label {
+  font-family: 'Shouxie'; font-size: 20px; color: var(--ink);
+  margin: 6px 2px 14px; letter-spacing: 1px;
+}
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-bottom: 14px;
+}
+.btn {
+  border: none; cursor: pointer;
+  font-family: 'Shouxie'; font-size: 17px; letter-spacing: 2px;
+  padding: 10px 26px; border-radius: 999px;
+  background: var(--accent); color: #fff;
+  transition: transform .15s, opacity .2s;
+  box-shadow: 0 3px 10px rgba(201,111,58,.25);
+}
+.btn:active { transform: scale(.94); }
+.btn.ghost {
+  background: transparent; color: var(--accent-deep);
+  border: 1px solid var(--accent); box-shadow: none;
+}
+.btn.small { font-size: 14px; padding: 6px 16px; }
+.btn[disabled] { opacity: .4; pointer-events: none; }
+
+input[type=text], textarea {
+  width: 100%; border: 1px solid var(--line); border-radius: 12px;
+  background: var(--card); color: var(--ink);
+  padding: 11px 14px; font-size: 14px;
+  outline: none; font-family: inherit;
+  transition: border-color .2s;
+}
+input:focus, textarea:focus { border-color: var(--accent); }
+textarea { resize: none; }
+
+.empty-state {
+  text-align: center; padding: 70px 30px; color: var(--ink-faint);
+  font-family: 'Shouxie'; font-size: 18px; letter-spacing: 1px; line-height: 2;
+}
+
+/* 人设色点 */
+.dot {
+  display: inline-block; width: 10px; height: 10px;
+  border-radius: 50%; margin-right: 6px;
+  vertical-align: middle;
+}
+/* 对聊流滚动 */
+#chat-flow { overflow-y: auto; max-height: calc(100vh - 300px); }
+/* 输入区键盘安全 */
+#interrupt-input { font-size: 16px; }

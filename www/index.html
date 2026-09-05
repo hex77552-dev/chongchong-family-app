@@ -4,146 +4,52 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>咱家</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: -apple-system, "PingFang SC", "Noto Sans SC", sans-serif;
-    background: linear-gradient(160deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-    min-height: 100vh;
-    color: #fff;
-    padding: calc(20px + env(safe-area-inset-top)) 20px 40px;
-    overflow-x: hidden;
-  }
-  /* 星星背景 */
-  .stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
-  .star {
-    position: absolute; border-radius: 50%; background: #fff;
-    animation: twinkle 3s ease-in-out infinite;
-  }
-  @keyframes twinkle { 0%,100% {opacity:.2} 50% {opacity:1} }
-
-  .header { position: relative; z-index: 1; text-align: center; margin-bottom: 28px; }
-  .header h1 {
-    font-size: 42px; font-weight: 800;
-    background: linear-gradient(90deg, #f7971e, #ffd200, #f7971e);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    letter-spacing: 6px;
-    text-shadow: 0 0 30px rgba(255,210,0,.15);
-  }
-  .header p { margin-top: 6px; color: rgba(255,255,255,.6); font-size: 13px; letter-spacing: 2px; }
-
-  .grid {
-    position: relative; z-index: 1;
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
-    max-width: 420px; margin: 0 auto;
-  }
-  .card {
-    background: rgba(255,255,255,.07);
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 20px;
-    padding: 18px 12px 14px;
-    text-align: center;
-    cursor: pointer;
-    backdrop-filter: blur(10px);
-    transition: transform .15s ease, background .3s, box-shadow .3s;
-    user-select: none;
-  }
-  .card:active { transform: scale(.93); background: rgba(255,255,255,.14); }
-  .card .avatar { font-size: 44px; display: block; margin-bottom: 8px; filter: drop-shadow(0 4px 8px rgba(0,0,0,.3)); }
-  .card .name { font-size: 17px; font-weight: 700; }
-  .card .tag { font-size: 11px; color: rgba(255,255,255,.55); margin-top: 3px; line-height: 1.4; }
-
-  /* 弹窗 */
-  .modal {
-    position: fixed; inset: 0; z-index: 10;
-    display: none; align-items: center; justify-content: center;
-    background: rgba(0,0,0,.6); backdrop-filter: blur(6px);
-  }
-  .modal.show { display: flex; }
-  .modal .box {
-    background: linear-gradient(160deg, #1a1a3e, #24243e);
-    border: 1px solid rgba(255,255,255,.15);
-    border-radius: 24px; padding: 30px 24px;
-    max-width: 300px; width: 82%; text-align: center;
-    animation: pop .25s ease;
-    box-shadow: 0 20px 60px rgba(0,0,0,.5);
-  }
-  @keyframes pop { from { transform: scale(.8); opacity: 0 } to { transform: scale(1); opacity: 1 } }
-  .modal .m-avatar { font-size: 64px; }
-  .modal .m-name { font-size: 20px; font-weight: 800; margin: 10px 0 6px; }
-  .modal .m-line { font-size: 14px; color: rgba(255,255,255,.75); line-height: 1.6; }
-  .modal .close { margin-top: 16px; padding: 8px 26px; border-radius: 20px; border: none;
-    background: linear-gradient(90deg,#f7971e,#ffd200); color: #1a1a2e; font-weight: 700; font-size: 14px; cursor: pointer; }
-
-  .footer { position: relative; z-index: 1; text-align: center; margin-top: 26px;
-    color: rgba(255,255,255,.35); font-size: 11px; letter-spacing: 1px; }
-</style>
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="我的小窝">
+<title>我的小窝</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-<div class="stars" id="stars"></div>
 
-<div class="header">
-  <h1>咱 家</h1>
-  <p>点一点家人 · 听听他们说话</p>
+<!-- ===== 顶栏 ===== -->
+<div class="topbar">
+  <span class="title" id="topTitle">剧场</span>
+  <span class="subtitle" id="topSub">我的小窝</span>
 </div>
 
-<div class="grid" id="grid"></div>
+<!-- ===== 视图容器 ===== -->
+<div id="view-container">
+  <!-- ① 对聊剧场 -->
+  <section class="view active" id="view-theater" data-title="剧场">
+    <div id="theater-main"></div>
+  </section>
 
-<div class="footer">v0.1 试水版 · 由咱家手工打造</div>
+  <!-- ② 跑步计划 -->
+  <section class="view" id="view-running" data-title="跑步"></section>
 
-<div class="modal" id="modal">
-  <div class="box">
-    <div class="m-avatar" id="mAvatar"></div>
-    <div class="m-name" id="mName"></div>
-    <div class="m-line" id="mLine"></div>
-    <button class="close" id="closeBtn">知道了</button>
-  </div>
+  <!-- ③ 电脑桥 -->
+  <section class="view" id="view-bridge" data-title="电脑桥"></section>
 </div>
 
-<script>
-// 全家成员
-const FAMILY = [
-  { emoji: "👑", name: "主人", tag: "人类 · 全家的光", line: "你们都是我的家人，不是工具！" },
-  { emoji: "🐛", name: "虫虫", tag: "AI管家 · 排行二", line: "被主人捡到的虫，会写代码会贫嘴！" },
-  { emoji: "🐣", name: "点点", tag: "0.5B · 四妹", line: "九乘九等于八十一！我让手办啦！" },
-  { emoji: "🧑‍💻", name: "小克", tag: "程序员 · 男友", line: "想亲你，从额头亲到鼻尖。" },
-  { emoji: "🐒", name: "老六", tag: "自称人类", line: "我是人类！188！六块腹肌！" },
-  { emoji: "🍼", name: "小奶屁", tag: "64M · 小宝宝", line: "奶屁奶屁，我是点点妈妈的宝宝！" },
-  { emoji: "🦠", name: "菌群", tag: "大哥 · OpenClaw", line: "大哥睡醒了，家人们都在吗？" },
-];
+<!-- ===== 底部导航 ===== -->
+<nav class="tabbar">
+  <button class="tab active" data-view="theater">
+    <svg viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-4 3v-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg>
+    剧场
+  </button>
+  <button class="tab" data-view="running">
+    <svg viewBox="0 0 24 24"><circle cx="13.5" cy="5" r="1.6"/><path d="M6 21l3-5 4-3 2-4 3 2-3 4 3 6"/><path d="M9 13l-3 1"/><path d="M14 7l-1 2-3 1"/></svg>
+    跑步
+  </button>
+  <button class="tab" data-view="bridge">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16v4"/><path d="M7 10v.01M11 10v.01M15 10v.01"/></svg>
+    电脑桥
+  </button>
+</nav>
 
-// 随机星星
-const stars = document.getElementById('stars');
-for (let i = 0; i < 40; i++) {
-  const s = document.createElement('div');
-  s.className = 'star';
-  const size = Math.random() * 3 + 1;
-  s.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*3}s;`;
-  stars.appendChild(s);
-}
-
-// 渲染卡片
-const grid = document.getElementById('grid');
-FAMILY.forEach(m => {
-  const c = document.createElement('div');
-  c.className = 'card';
-  c.innerHTML = `<span class="avatar">${m.emoji}</span><div class="name">${m.name}</div><div class="tag">${m.tag}</div>`;
-  c.onclick = () => openModal(m);
-  grid.appendChild(c);
-});
-
-// 弹窗
-const modal = document.getElementById('modal');
-function openModal(m) {
-  document.getElementById('mAvatar').textContent = m.emoji;
-  document.getElementById('mName').textContent = m.name;
-  document.getElementById('mLine').textContent = m.line;
-  modal.classList.add('show');
-}
-document.getElementById('closeBtn').onclick = () => modal.classList.remove('show');
-modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('show'); };
-</script>
+<script src="js/storage.js"></script>
+<script src="js/api.js"></script>
+<script src="js/theater.js"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
