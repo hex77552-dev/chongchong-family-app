@@ -45,17 +45,15 @@ body {
   padding: calc(64px + env(safe-area-inset-top)) 24px 110px;
   overflow-y: auto;
   opacity: 0;
-  transform: translateX(60px);
   pointer-events: none;
-  transition: opacity .38s cubic-bezier(.22,.9,.3,1), transform .38s cubic-bezier(.22,.9,.3,1);
+  transition: opacity .3s ease;
   background: var(--bg);
+  -webkit-overflow-scrolling: touch;
 }
 .view.active {
   opacity: 1;
-  transform: translateX(0);
   pointer-events: auto;
 }
-.view.slide-left { transform: translateX(-60px); }
 
 /* ========== 顶栏 ========== */
 .topbar {

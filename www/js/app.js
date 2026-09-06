@@ -20,11 +20,8 @@ const App = {
     const next = document.getElementById('view-' + name);
     if (!old || !next) return;
 
-    // 翻页特效：旧页滑出，新页滑入
+    // 淡入淡出切换
     old.classList.remove('active');
-    old.classList.add('slide-left');
-    setTimeout(() => old.classList.remove('slide-left'), 450);
-
     next.classList.add('active');
     this.current = name;
 
