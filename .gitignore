@@ -6,3 +6,6 @@ ios/App/Pods/
 
 # OS files
 .DS_Store
+
+# Build artifacts
+dist/
