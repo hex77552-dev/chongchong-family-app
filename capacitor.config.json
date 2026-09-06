@@ -1,6 +1,6 @@
 {
   "appId": "com.zanji.family",
-  "appName": "我的小窝",
+  "appName": "My Nest",
   "webDir": "www",
   "server": {
     "androidScheme": "https"
