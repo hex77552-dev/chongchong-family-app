@@ -149,10 +149,13 @@ const Theater = {
     if (!this._flowEl) return;
     const color = h.role === 'a' ? this.session.a.color : h.role === 'b' ? this.session.b.color : '#b0a89c';
     const name = h.role === 'a' ? this.session.a.name : h.role === 'b' ? this.session.b.name : '我';
+    // 气泡按角色着色（淡色底 + 同色系边框）；插话"我"用白卡
+    const bubbleBg = h.role === 'x' ? 'var(--card)' : color + '22';
+    const bubbleBorder = h.role === 'x' ? 'var(--line)' : color + '66';
     const div = document.createElement('div');
     div.style.cssText = 'margin-bottom:16px;';
-    div.innerHTML = `<div style="font-size:11px;color:${color};letter-spacing:1px;margin-bottom:4px;">${name}</div>
-      <div style="font-size:14px;line-height:1.8;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;display:inline-block;max-width:92%;white-space:pre-wrap;">${this._esc(h.text)}</div>`;
+    div.innerHTML = `<div style="font-size:11px;color:${color};letter-spacing:1px;margin-bottom:4px;font-weight:600;">${name}</div>
+      <div style="font-size:14px;line-height:1.8;color:var(--ink);background:${bubbleBg};border:1px solid ${bubbleBorder};border-radius:14px;padding:10px 14px;display:inline-block;max-width:92%;white-space:pre-wrap;">${this._esc(h.text)}</div>`;
     this._flowEl.appendChild(div);
     this._flowEl.scrollTop = this._flowEl.scrollHeight;
   },
@@ -183,7 +186,7 @@ const Theater = {
       s.busy = false;
       // 轮到下一位
       s.turn = role === 'a' ? 'b' : 'a';
-      this.timer = setTimeout(() => this._say(s.turn === 'a' ? 'a' : 'b'), 900);
+      this.timer = setTimeout(() => this._say(s.turn === 'a' ? 'a' : 'b'), 3000);
     } catch (e) {
       s.busy = false;
       if (s.alive) {
@@ -237,7 +240,7 @@ const Theater = {
     if (!s.alive) { s.alive = true; }
     clearTimeout(this.timer);
     const next = s.turn === 'a' ? 'b' : 'a';
-    this.timer = setTimeout(() => this._say(next), 600);
+    this.timer = setTimeout(() => this._say(next), 2500);
     this._setPauseLabel();
   },
 
