@@ -22,6 +22,20 @@ const Theater = {
     this.personas = Store.getPersonas();
     let html = `<div class="section-label">人设簿</div>`;
 
+    // 上次对话（可继续）
+    const log = Store.get('chatlog', null);
+    if (log && log.history && log.history.length) {
+      const when = new Date(log.time);
+      const hm = `${String(when.getHours()).padStart(2, '0')}:${String(when.getMinutes()).padStart(2, '0')}`;
+      html += `<div class="card" style="border-left:3px solid var(--accent);">
+        <div style="font-size:12px;color:var(--ink-faint);letter-spacing:1px;margin-bottom:6px;">上次的对话 · ${log.a.name} 与 ${log.b.name} · ${log.history.length} 条 · ${hm}</div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn small" onclick="Theater.resumeChat()">继续聊</button>
+          <button class="btn small ghost" onclick="Theater.discardChat()">清空记录</button>
+        </div>
+      </div>`;
+    }
+
     // 已选对局
     const pair = Store.getPair();
     html += `<div class="card">
@@ -162,7 +176,7 @@ const Theater = {
   _esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; },
 
   /* —— 对聊驱动 —— */
-  async _say(role) {
+  async _say(role, retry = 0) {
     const s = this.session;
     if (!s || !s.alive) return;
     s.busy = true;
@@ -181,8 +195,23 @@ const Theater = {
     try {
       const reply = await Api.chat(msgs);
       if (!s.alive) return;
-      s.history.push({ role: role, text: reply.slice(0, 180) });
-      this._appendMsg({ role, text: reply.slice(0, 180) });
+      // 空回复/太短：重试一次（qwen 思考模式偶尔把 token 用光返回空）
+      if ((!reply || reply.trim().length < 2) && retry < 2) {
+        s.busy = false;
+        this.timer = setTimeout(() => this._say(role, retry + 1), 1500);
+        return;
+      }
+      const text = (reply || '').trim();
+      if (!text) {
+        // 重试仍空：显示走神提示，继续下一位
+        s.history.push({ role, text: '（这位走神了，换你说了）' });
+        this._appendMsg({ role, text: '（这位走神了，换你说了）' });
+        this._persist();
+      } else {
+        s.history.push({ role, text: text.slice(0, 180) });
+        this._appendMsg({ role, text: text.slice(0, 180) });
+        this._persist();
+      }
       s.busy = false;
       // 轮到下一位
       s.turn = role === 'a' ? 'b' : 'a';
@@ -195,6 +224,19 @@ const Theater = {
         this._setPauseLabel();
       }
     }
+  },
+
+  /* 对话历史持久化（退出不丢） */
+  _persist() {
+    const s = this.session;
+    if (!s) return;
+    Store.set('chatlog', {
+      a: { id: s.a.id, name: s.a.name, color: s.a.color, desc: s.a.desc },
+      b: { id: s.b.id, name: s.b.name, color: s.b.color, desc: s.b.desc },
+      history: s.history.slice(-60),
+      time: Date.now(),
+      turn: s.turn,
+    });
   },
 
   togglePause() {
@@ -228,13 +270,36 @@ const Theater = {
     this._setPauseLabel();
   },
 
-  /* —— 插话 —— */
+  /* 恢复上次对话 */
+  resumeChat() {
+    const log = Store.get('chatlog', null);
+    if (!log || !log.a || !log.b) return;
+    this.session = {
+      a: log.a, b: log.b,
+      history: (log.history || []).slice(),
+      alive: false, busy: false,
+      turn: log.turn === 'b' ? 'b' : 'a',
+    };
+    this._renderTalk();
+    this._setPauseLabel();
+    this.alert('已恢复上次对话——点「继续」接着聊');
+  },
+
+  /* 清空对话记录 */
+  discardChat() {
+    Store.set('chatlog', null);
+    this.renderList();
+    this.alert('对话记录已清空');
+  },
+
+  /* 插话 —— */
   interrupt() {
     const s = this.session;
     const text = this._inputEl.value.trim();
     if (!s || !text) return;
     s.history.push({ role: 'x', text: text.slice(0, 100) });
     this._appendMsg({ role: 'x', text: text.slice(0, 100) });
+    this._persist();
     this._inputEl.value = '';
     // 插话后：让“对方”回应（若正在跑则等当前说完）
     if (!s.alive) { s.alive = true; }
