@@ -1,6 +1,6 @@
 {
   "appId": "com.zanji.family",
-  "appName": "咱家",
+  "appName": "我的小窝",
   "webDir": "www",
   "server": {
     "androidScheme": "https"
